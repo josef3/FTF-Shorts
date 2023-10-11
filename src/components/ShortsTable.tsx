@@ -8,34 +8,32 @@ interface Props {
 
 const ShortsTable: React.FC<Props> = ({ summary }) => {
 	let currentCategory = '';
-	const rows = summary.map(
-		({ product_code, product_desc, uos, category, short }, index) => {
-			const isCurrentCategory = currentCategory === category;
-			currentCategory = category;
-			return (
-				<React.Fragment key={`row_${index}`}>
-					{!isCurrentCategory && (
-						<Table.Tr key={`header_${index}`}>
-							<Table.Td style={{ textAlign: 'center' }}>
-								<Text size="xs" fw="bold">
-									{category}
-								</Text>
-							</Table.Td>
-							{/* <Table.Td></Table.Td> */}
-							<Table.Td></Table.Td>
-							<Table.Td></Table.Td>
-						</Table.Tr>
-					)}
-					<Table.Tr key={index}>
-						{/* <Table.Td>{product_code}</Table.Td> */}
-						<Table.Td>{product_desc}</Table.Td>
-						<Table.Td>{uos}</Table.Td>
-						<Table.Td>{short}</Table.Td>
+	const rows = summary.map(({ product_desc, uos, category, short }, index) => {
+		const isCurrentCategory = currentCategory === category;
+		currentCategory = category;
+		return (
+			<React.Fragment key={`row_${index}`}>
+				{!isCurrentCategory && (
+					<Table.Tr key={`header_${index}`}>
+						<Table.Td style={{ textAlign: 'center' }}>
+							<Text size="xs" fw="bold">
+								{category}
+							</Text>
+						</Table.Td>
+						{/* <Table.Td></Table.Td> */}
+						<Table.Td></Table.Td>
+						<Table.Td></Table.Td>
 					</Table.Tr>
-				</React.Fragment>
-			);
-		}
-	);
+				)}
+				<Table.Tr key={index}>
+					{/* <Table.Td>{product_code}</Table.Td> */}
+					<Table.Td>{product_desc}</Table.Td>
+					<Table.Td>{uos}</Table.Td>
+					<Table.Td>{short}</Table.Td>
+				</Table.Tr>
+			</React.Fragment>
+		);
+	});
 
 	return (
 		<Table>
