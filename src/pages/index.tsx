@@ -114,10 +114,7 @@ const Orders = () => {
 		<Flex direction="column" align="center" gap="xs">
 			<Flex align="center" justify="space-around" w="100%" mb="sm">
 				<Flex align="center">
-					<img
-						src="../../public/ftf-logo.jpeg"
-						style={{ width: 50, borderRadius: 10 }}
-					/>
+					<img src="/ftf-logo.jpeg" style={{ width: 50, borderRadius: 10 }} />
 					<Text ml="sm" fw="bold">
 						FTF Shorts
 					</Text>
