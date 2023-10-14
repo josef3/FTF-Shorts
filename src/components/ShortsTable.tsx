@@ -4,9 +4,10 @@ import { Summary } from '../pages';
 
 interface Props {
 	summary: Summary;
+	withBorder?: boolean;
 }
 
-const ShortsTable: React.FC<Props> = ({ summary }) => {
+const ShortsTable: React.FC<Props> = ({ summary, withBorder = false }) => {
 	let currentCategory = '';
 	const rows = summary.map(({ product_desc, uos, category, short }, index) => {
 		const isCurrentCategory = currentCategory === category;
@@ -14,7 +15,10 @@ const ShortsTable: React.FC<Props> = ({ summary }) => {
 		return (
 			<React.Fragment key={`row_${index}`}>
 				{!isCurrentCategory && (
-					<Table.Tr key={`header_${index}`}>
+					<Table.Tr
+						style={{ backgroundColor: '#f1f3f5' }}
+						key={`header_${index}`}
+					>
 						<Table.Td style={{ textAlign: 'center' }}>
 							<Text size="xs" fw="bold">
 								{category}
@@ -36,11 +40,14 @@ const ShortsTable: React.FC<Props> = ({ summary }) => {
 	});
 
 	return (
-		<Table>
+		<Table
+			style={{ maxWidth: '700px', width: '80vw' }}
+			withTableBorder={withBorder}
+		>
 			<Table.Thead>
 				<Table.Tr>
 					{/* <Table.Th>Code</Table.Th> */}
-					<Table.Th>Description</Table.Th>
+					<Table.Th style={{ minWidth: '300px' }}>Description</Table.Th>
 					<Table.Th>Unit of Sale</Table.Th>
 					<Table.Th>Short Qty</Table.Th>
 				</Table.Tr>

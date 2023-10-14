@@ -6,6 +6,7 @@ import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
 import DashboardLayout from './layouts/DashboardLayout.tsx';
 import Orders from './pages';
+import './global.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>

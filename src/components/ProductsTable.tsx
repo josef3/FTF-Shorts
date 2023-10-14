@@ -1,5 +1,6 @@
 import { Button, Checkbox, Flex, Input, Table, Text } from '@mantine/core';
 import React from 'react';
+//----------------------------------------------------------
 
 export interface Product {
 	product_code: string;
@@ -29,13 +30,16 @@ const ProductsTable: React.FC<Props> = ({ data, orderNumber, updateShort }) => {
 			return (
 				<React.Fragment key={`row_${index}`}>
 					{!isCurrentCategory && (
-						<Table.Tr key={`header_${index}`}>
+						<Table.Tr
+							style={{ backgroundColor: '#f1f3f5' }}
+							key={`header_${index}`}
+						>
+							<Table.Td></Table.Td>
 							<Table.Td style={{ textAlign: 'center' }}>
 								<Text size="xs" fw="bold">
 									{category}
 								</Text>
 							</Table.Td>
-							<Table.Td></Table.Td>
 							<Table.Td></Table.Td>
 							<Table.Td></Table.Td>
 							<Table.Td></Table.Td>
@@ -92,7 +96,7 @@ const ProductsTable: React.FC<Props> = ({ data, orderNumber, updateShort }) => {
 	);
 
 	return (
-		<Table>
+		<Table withTableBorder>
 			<Table.Thead>
 				<Table.Tr>
 					<Table.Th>Code</Table.Th>

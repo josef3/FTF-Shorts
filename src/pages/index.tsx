@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+	Affix,
 	Button,
 	Container,
 	Flex,
@@ -7,14 +8,16 @@ import {
 	Text,
 	TextInput,
 	Title,
+	Transition,
 } from '@mantine/core';
-import { useDebouncedState } from '@mantine/hooks';
+import { useDebouncedState, useWindowScroll } from '@mantine/hooks';
 import { onValue, ref, set } from 'firebase/database';
 import { db } from '../db';
 import ProductsTable, { Product } from '../components/ProductsTable';
 import ShortsTable from '../components/ShortsTable';
+import SummaryByRoute from '../components/SummaryByRoute';
 
-interface Order {
+export interface Order {
 	customer_code: string;
 	customer_name: string;
 	order_number: number;
@@ -64,6 +67,7 @@ function getSummary(data: Order[] | undefined) {
 }
 
 const Orders = () => {
+	const [scroll, scrollTo] = useWindowScroll();
 	const [orders, setOrders] = useState<Order[]>();
 	const [filteredOrder, setFilteredOrder] = useState<Order>();
 
@@ -111,66 +115,132 @@ const Orders = () => {
 	}, [search, orders]);
 
 	return (
-		<Flex direction="column" align="center" gap="xs">
-			<Flex align="center" justify="space-around" w="100%" mb="sm">
-				<Flex align="center">
-					<img src="/ftf-logo.jpeg" style={{ width: 50, borderRadius: 10 }} />
-					<Text ml="sm" fw="bold">
-						FTF Shorts
-					</Text>
-				</Flex>
-				<SegmentedControl
-					value={segment}
-					onChange={setSegment}
-					data={[
-						{ value: 'Orders', label: 'Orders' },
-						{ value: 'Summary', label: 'Summary' },
-					]}
-				/>
-			</Flex>
-			{segment === 'Orders' ? (
-				<Container style={{ minWidth: '60vw' }}>
-					<Flex justify="center">
-						<Title order={2} mb="md">
-							List of orders
-						</Title>
-					</Flex>
-					<Flex align="center" justify="space-between" mb="md">
-						<TextInput
-							label="Order no."
-							size="sm"
-							onChange={(event) => setSearch(event.currentTarget.value)}
-						/>
-						<Text fw="bold">Date: {date}</Text>
-					</Flex>
-					{filteredOrder != null && (
-						<ProductsTable
-							data={filteredOrder.products}
-							orderNumber={filteredOrder.order_number}
-							updateShort={updateShort}
-						/>
-					)}
-					{filteredOrder == null && search.length > 0 && (
-						<Text>No order found</Text>
-					)}
-				</Container>
-			) : (
-				<Container>
-					<Flex justify="center">
-						<Title order={2} mb="md">
-							Shorts Summary
-						</Title>
-					</Flex>
-					<Flex justify="space-between" align="center" mb="md">
-						<Text>Date: {date}</Text>
-						<Button mb="sm" variant="filled" onClick={() => window.print()}>
-							Print report
+		<>
+			<Affix position={{ bottom: 20, right: 20 }}>
+				<Transition transition="slide-up" mounted={scroll.y > 0}>
+					{(transitionStyles) => (
+						<Button
+							leftSection={
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 24 24"
+									fill="currentColor"
+									style={{ width: '1rem' }}
+								>
+									<path
+										fill-rule="evenodd"
+										d="M12 20.25a.75.75 0 01-.75-.75V6.31l-5.47 5.47a.75.75 0 01-1.06-1.06l6.75-6.75a.75.75 0 011.06 0l6.75 6.75a.75.75 0 11-1.06 1.06l-5.47-5.47V19.5a.75.75 0 01-.75.75z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							}
+							style={transitionStyles}
+							onClick={() => scrollTo({ y: 0 })}
+						>
+							Scroll to top
 						</Button>
+					)}
+				</Transition>
+			</Affix>
+			<Flex direction="column" align="center" gap="xs">
+				<Flex align="center" justify="space-around" w="100%" mb="sm">
+					<Flex align="center">
+						<img src="/ftf-logo.jpeg" style={{ width: 50, borderRadius: 10 }} />
+						<Text ml="sm" fw="bold">
+							FTF Shorts
+						</Text>
 					</Flex>
-					<ShortsTable summary={summary} />
-				</Container>
-			)}
-		</Flex>
+					<SegmentedControl
+						value={segment}
+						onChange={setSegment}
+						data={[
+							{ value: 'Orders', label: 'Orders' },
+							{ value: 'Summary', label: 'Summary' },
+							{ value: 'By Route', label: 'By Route' },
+						]}
+					/>
+				</Flex>
+				{segment === 'Orders' && (
+					<Container style={{ minWidth: '60vw' }}>
+						<Flex justify="center">
+							<Title order={2} mb="md">
+								List of orders
+							</Title>
+						</Flex>
+						<Flex align="center" justify="space-between" mb="md">
+							<TextInput
+								label="Order no."
+								size="sm"
+								onChange={(event) => setSearch(event.currentTarget.value)}
+							/>
+							<Text fw="bold">Date: {date}</Text>
+						</Flex>
+						{filteredOrder != null && (
+							<ProductsTable
+								data={filteredOrder.products}
+								orderNumber={filteredOrder.order_number}
+								updateShort={updateShort}
+							/>
+						)}
+						{filteredOrder == null && search.length > 0 && (
+							<Text>No order found</Text>
+						)}
+					</Container>
+				)}
+				{segment === 'Summary' && (
+					<Container fluid>
+						<Flex justify="center">
+							<Title order={2} mb="md">
+								Shorts Summary
+							</Title>
+						</Flex>
+						<Flex justify="space-between" align="center" mb="md">
+							<Text fw="bold">Date: {date}</Text>
+							<Button
+								mb="sm"
+								variant="filled"
+								onClick={() => window.print()}
+								className="no-print"
+							>
+								Print report
+							</Button>
+						</Flex>
+						<ShortsTable summary={summary} withBorder />
+					</Container>
+				)}
+				{segment === 'By Route' && (
+					<Container fluid>
+						{/* <div style={{ width: '100%', maxWidth: '1000px' }}> */}
+						<Flex justify="center">
+							<Title order={2} mb="md">
+								Shorts Summary Detailed
+							</Title>
+						</Flex>
+						<Flex
+							justify="space-between"
+							align="center"
+							mb="md"
+							style={{ width: '100%' }}
+						>
+							<Text fw="bold">Date: {date}</Text>
+							<Button
+								mb="sm"
+								variant="filled"
+								onClick={() => window.print()}
+								className="no-print"
+							>
+								Print report
+							</Button>
+						</Flex>
+						{/* <ShortsTable summary={summary} /> */}
+						<Flex>
+							<SummaryByRoute orders={orders} />
+						</Flex>
+						{/* </div> */}
+					</Container>
+				)}
+			</Flex>
+		</>
 	);
 };
 
