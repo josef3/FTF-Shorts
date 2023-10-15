@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { onValue, ref, set } from 'firebase/database';
 import {
 	Affix,
 	Button,
@@ -11,12 +12,14 @@ import {
 	Transition,
 } from '@mantine/core';
 import { useDebouncedState, useWindowScroll } from '@mantine/hooks';
-import { onValue, ref, set } from 'firebase/database';
-import { db } from '../db';
+//-------------------- Components --------------------------
 import ProductsTable, { Product } from '../components/ProductsTable';
 import ShortsTable from '../components/ShortsTable';
 import SummaryByRoute from '../components/SummaryByRoute';
-
+//----------------------------------------------------------
+import { getActualDate } from '../utils';
+import { db } from '../db';
+//----------------------------------------------------------
 export interface Order {
 	customer_code: string;
 	customer_name: string;
@@ -75,19 +78,17 @@ const Orders = () => {
 
 	const [segment, setSegment] = useState('Orders');
 
-	const date = '10-10-2023';
-	// const date = getTomorrowsDate();
+	const date = getActualDate();
 
 	const summary = getSummary(orders);
 
 	useEffect(() => {
 		const query = ref(db, date);
-		// set(ref(db, `${date}/0/products/1/short`), 3);
 		return onValue(query, (snapshot) => {
 			const data = snapshot.val();
 			setOrders(data);
 		});
-	}, []);
+	}, [date]);
 
 	const updateShort = (
 		orderNumber: number,
@@ -210,7 +211,6 @@ const Orders = () => {
 				)}
 				{segment === 'By Route' && (
 					<Container fluid>
-						{/* <div style={{ width: '100%', maxWidth: '1000px' }}> */}
 						<Flex justify="center">
 							<Title order={2} mb="md">
 								Shorts Summary Detailed
@@ -232,11 +232,9 @@ const Orders = () => {
 								Print report
 							</Button>
 						</Flex>
-						{/* <ShortsTable summary={summary} /> */}
 						<Flex>
 							<SummaryByRoute orders={orders} />
 						</Flex>
-						{/* </div> */}
 					</Container>
 				)}
 			</Flex>
